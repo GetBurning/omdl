@@ -33,8 +33,6 @@
   \amu_include (include/amu/pgid_path_pstem_pg.amu)
 *******************************************************************************/
 
-include <../datatypes/datatypes-base.scad>;
-
 //----------------------------------------------------------------------------//
 // validation.
 //----------------------------------------------------------------------------//
@@ -301,9 +299,7 @@ function bitwise_rsh
 /*
 BEGIN_SCOPE validate;
   BEGIN_OPENSCAD;
-    include <console.scad>;
-    include <datatypes/table.scad>;
-    include <math/bitwise.scad>;
+    include <omdl-base.scad>;
     include <validation.scad>;
 
     echo( str("openscad version ", version()) );
@@ -334,7 +330,7 @@ BEGIN_SCOPE validate;
       ["t12", "test value 10",              [856, 625]]
     ];
 
-    test_ids = get_table_ridl( test_r );
+    test_ids = table_get_row_ids( test_r );
 
     // expected columns: ("id" + one column for each test)
     good_c = pmerge([concat("id", test_ids), concat("identifier", test_ids)]);
@@ -533,24 +529,24 @@ BEGIN_SCOPE validate;
     table_check( good_r, good_c, false );
 
     // validate helper function and module
-    function get_value( vid ) = get_table_v(test_r, test_c, vid, "tv");
+    function get_value( vid ) = table_get_value(test_r, test_c, vid, "tv");
     function gv( vid, e ) = get_value( vid )[e];
     module log_test( m ) { log_type ( "test", m ); }
     module log_notest( f ) { log_test ( str("not tested: '", f, "'") ); }
     module run( fname, vid )
     {
-      value_text = get_table_v(test_r, test_c, vid, "td");
+      value_text = table_get_value(test_r, test_c, vid, "td");
 
-      if ( get_table_v(good_r, good_c, fname, vid) != skip )
+      if ( table_get_value(good_r, good_c, fname, vid) != skip )
         children();
       else
         log_test( str(vid, " -skip-: '", fname, "(", value_text, ")'") );
     }
     module test( fname, fresult, vid )
     {
-      value_text = get_table_v(test_r, test_c, vid, "td");
-      fname_argc = get_table_v(good_r, good_c, fname, "fac");
-      pass_value = get_table_v(good_r, good_c, fname, vid);
+      value_text = table_get_value(test_r, test_c, vid, "td");
+      fname_argc = table_get_value(good_r, good_c, fname, "fac");
+      pass_value = table_get_value(good_r, good_c, fname, vid);
 
       test_pass = validate(cv=fresult, t="equals", ev=pass_value, pf=true);
       farg_text = lstr(eappend(", ", rselect(get_value(vid), [0:fname_argc-1]), r=false, j=false, l=false));

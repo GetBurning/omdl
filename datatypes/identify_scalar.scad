@@ -65,11 +65,7 @@
   \returns  <boolean> \b true when the value is defined
             and \b false otherwise.
 *******************************************************************************/
-function is_defined
-(
-  v
-) = (v == undef) ? false
-  : true;
+function is_defined(v) = if_undef(v)? false : true;
 
 //! Test if a value is not defined.
 /***************************************************************************//**
@@ -78,11 +74,7 @@ function is_defined
   \returns  <boolean> \b true when the value is not defined
             and \b false otherwise.
 *******************************************************************************/
-function not_defined
-(
-  v
-) = (v == undef) ? true
-  : false;
+function not_defined(v) = is_undef(v)? true : false;
 
 //! Test if a numerical value is invalid.
 /***************************************************************************//**
@@ -91,7 +83,7 @@ function not_defined
   \returns  <boolean> \b true when the value is determined to be
             \b nan (Not A Number) and \b false otherwise.
 *******************************************************************************/
-function is_nan( v ) = ( v != v );
+function is_nan(v) = ( v != v );
 
 //! Test if a numerical value is infinite.
 /***************************************************************************//**
@@ -101,7 +93,7 @@ function is_nan( v ) = ( v != v );
             \b inf (greater than the largest representable number)
             and \b false otherwise.
 *******************************************************************************/
-function is_inf( v ) = ( v == (number_max * number_max) );
+function is_inf(v) = ( v == (number_max * number_max) );
 
 //! Test if a value is a single non-iterable value.
 /***************************************************************************//**
@@ -123,7 +115,7 @@ function is_inf( v ) = ( v == (number_max * number_max) );
      \b inf        | \b true
      \b nan        | \b true
 *******************************************************************************/
-function is_scalar( v ) = (len(v) == undef);
+function is_scalar( v ) = !(is_string(v) || is_list(v));
 
 //! Test if a value has multiple parts and is iterable.
 /***************************************************************************//**
@@ -145,7 +137,7 @@ function is_scalar( v ) = (len(v) == undef);
      \b inf        | \b false
      \b nan        | \b false
 *******************************************************************************/
-function is_iterable( v ) = (len(v) != undef);
+function is_iterable(v) = is_string(v) || is_list(v);
 
 //! Test if an iterable value is empty.
 /***************************************************************************//**
@@ -154,7 +146,7 @@ function is_iterable( v ) = (len(v) != undef);
   \returns  <boolean> \b true when the iterable value has zero elements
             and \b false otherwise.
 *******************************************************************************/
-function is_empty( v ) = (len(v) == 0);
+function is_empty(v) = (len(v) == 0);
 
 //! Test if a value is a number.
 /***************************************************************************//**
@@ -165,7 +157,7 @@ function is_empty( v ) = (len(v) == 0);
 
   \note     Returns \b true for \b inf and \b nan values.
 *******************************************************************************/
-function is_number( v ) = is_defined(v % 1);
+function is_number(v) = is_num(v);
 
 //! Test if a value is an integer.
 /***************************************************************************//**
@@ -174,11 +166,7 @@ function is_number( v ) = is_defined(v % 1);
   \returns  <boolean> \b true when the value is an integer
             and \b false otherwise.
 *******************************************************************************/
-function is_integer
-(
-  v
-) = not_defined(v) ? false
-  : ((v % 1) == 0);
+function is_integer(v) = is_undef(v) ? false : ((v % 1) == 0);
 
 //! Test if a value is a decimal.
 /***************************************************************************//**
@@ -187,7 +175,7 @@ function is_integer
   \returns  <boolean> \b true when the value is a decimal
             and \b false otherwise.
 *******************************************************************************/
-function is_decimal( v ) = ((v % 1) > 0);
+function is_decimal(v) = ((v % 1) > 0);
 
 //! Test if a value is a predefined boolean constant.
 /***************************************************************************//**
@@ -196,31 +184,7 @@ function is_decimal( v ) = ((v % 1) > 0);
   \returns  <boolean> \b true when the value is one of the predefined
             boolean constants <tt>[true|false]</tt> and \b false otherwise.
 *******************************************************************************/
-function is_boolean
-(
-  v
-) = is_string(v) ? false
-  : (str(v) == "true") ? true
-  : (str(v) == "false") ? true
-  : false;
-
-//! Test if a value is a string.
-/***************************************************************************//**
-  \param    v \<value> A value.
-
-  \returns  <boolean> \b true when the value is a string
-            and \b false otherwise.
-*******************************************************************************/
-function is_string( v ) = (str(v) == v);
-
-//! Test if a value is an iterable list of values.
-/***************************************************************************//**
-  \param    v \<value> A value.
-
-  \returns  <boolean> \b true when the value is a list
-            and \b false otherwise.
-*******************************************************************************/
-function is_list( v ) =  is_iterable(v) && !is_string(v);
+function is_boolean(v) = is_bool(v);
 
 //! Test if a value is a range definition.
 /***************************************************************************//**
@@ -238,10 +202,7 @@ function is_list( v ) =  is_iterable(v) && !is_string(v);
     when possible.
   \endinternal
 *******************************************************************************/
-function is_range
-(
-  v
-) = is_defined(v) &&
+function is_range(v) = is_defined(v) &&
     !is_iterable(v) &&
     !is_boolean(v) &&
     !is_integer(v) &&
@@ -256,10 +217,7 @@ function is_range
   \returns  <boolean> \b true when the value is determined to be \e even
             and \b false otherwise (The value may be positive or negative).
 *******************************************************************************/
-function is_even
-(
-  v
-) = !is_integer(v) ? false
+function is_even(v) = !is_integer(v) ? false
   : ((v % 2) == 0);
 
 //! Test if a numerical value is odd.
@@ -269,10 +227,7 @@ function is_even
   \returns  <boolean> \b true when the value is determined to be \e odd
             and \b false otherwise (The value may be positive or negative).
 *******************************************************************************/
-function is_odd
-(
-  v
-) = !is_integer(v) ? false
+function is_odd(v) = !is_integer(v) ? false
   : ((v % 2) != 0);
 
 //! Test if a numerical value is between an upper and lower bounds.
@@ -284,12 +239,7 @@ function is_odd
   \returns  <boolean> \b true when the value is between the upper and
             lower bounds and \b false otherwise.
 *******************************************************************************/
-function is_between
-(
-  v,
-  l,
-  u
-) = ((v >= l) && (v <=u));
+function is_between(v, l, u) = ((v >= l) && (v <=u));
 
 //! @}
 //! @}
@@ -301,9 +251,7 @@ function is_between
 /*
 BEGIN_SCOPE validate;
   BEGIN_OPENSCAD;
-    include <console.scad>;
-    include <datatypes/datatypes-base.scad>;
-    include <datatypes/table.scad>;
+    include <omdl-base.scad>;
     include <validation.scad>;
 
     echo( str("openscad version ", version()) );
@@ -342,7 +290,7 @@ BEGIN_SCOPE validate;
       ["t21", "A range",                    [0:0.5:9]]
     ];
 
-    test_ids = get_table_ridl( test_r );
+    test_ids = table_get_row_ids( test_r );
 
     // expected columns: ("id" + one column for each test)
     good_c = pmerge([concat("id", test_ids), concat("identifier", test_ids)]);
@@ -379,13 +327,13 @@ BEGIN_SCOPE validate;
     table_check( good_r, good_c, false );
 
     // validate helper function and module
-    function get_value( vid ) = get_table_v(test_r, test_c, vid, "tv");
+    function get_value( vid ) = table_get_value(test_r, test_c, vid, "tv");
     module log_test( m ) { log_type ( "test", m ); }
     module log_notest( f ) { log_test ( str("not tested: '", f, "'") ); }
     module run_test( fname, fresult, vid )
     {
-      value_text = get_table_v(test_r, test_c, vid, "td");
-      pass_value = get_table_v(good_r, good_c, fname, vid);
+      value_text = table_get_value(test_r, test_c, vid, "td");
+      pass_value = table_get_value(good_r, good_c, fname, vid);
 
       test_pass = validate( cv=fresult, t=pass_value, pf=true );
       test_text = validate( str(fname, "(", get_value(vid), ")=", pass_value), fresult, pass_value );

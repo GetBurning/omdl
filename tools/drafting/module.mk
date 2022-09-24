@@ -4,18 +4,16 @@
 $(eval $(call clear-local-module))
 #------------------------------------------------------------------------------#
 
-local_path        :=  math
+local_path        :=  tools/drafting
 
 local_library     :=  module \
                       \
-                      linear_algebra \
-                      vector_algebra \
+                      config \
+                      primitive \
+                      operation \
+                      dimension \
                       \
-                      bitwise \
-                      polygon_primitives \
-                      polytope \
-                      triangle \
-                      utility
+                      draft-base
 
 local_release_add :=
 

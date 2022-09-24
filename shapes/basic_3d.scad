@@ -1,8 +1,8 @@
-//! Common 3D derivative shapes.
+//! Basic 3D derivative shapes.
 /***************************************************************************//**
   \file
   \author Roy Allen Sutton
-  \date   2015-2018
+  \date   2015-2019
 
   \copyright
 
@@ -28,23 +28,20 @@
   \details
 
     \amu_define group_name  (3d Shapes)
-    \amu_define group_brief (Common 3D derivative shapes.)
+    \amu_define group_brief (Basic 3D derivative shapes.)
     \amu_define view        (diag)
 
   \amu_include (include/amu/pgid_path_pstem_pg.amu)
 *******************************************************************************/
 
-include <derivative_2d.scad>;
-include <../tools/extrude.scad>;
-
 //----------------------------------------------------------------------------//
-// openscad-amu macros
+// group and macros.
 //----------------------------------------------------------------------------//
 
 /***************************************************************************//**
-  \amu_include (include/amu/example_dim_table.amu)
-
   \amu_include (include/amu/group_in_parent_start.amu)
+
+  \amu_include (include/amu/example_dim_table.amu)
 *******************************************************************************/
 
 //----------------------------------------------------------------------------//
@@ -92,13 +89,13 @@ module cone
     translate([-cr, 0])
     difference()
     {
-      triangle_sss( s1=cr*2, s2=hl, s3=hl, v1r=br, v2r=br, v3r=pr );
+      triangle_ls_c( vs=[cr*2, hl, hl], vr=[br, br, pr] );
       square( size=[cr,h], center=false );
     }
   }
 }
 
-//! A cuboid with edge, fillet, or chamfer corners.
+//! A cuboid with edge, round, or chamfer corners.
 /***************************************************************************//**
   \param    size <decimal-list-3|decimal> A list [x, y, z] of decimals
             or a single decimal for (x=y=z).
@@ -118,12 +115,12 @@ module cone
 
     | vrm | B1  | B0  | Description                                 |
     |:---:|:---:|:---:|:--------------------------------------------|
-    |  0  |  0  |  0  | \em fillet edges with \em fillet vertexes   |
+    |  0  |  0  |  0  | \em round edges with \em round vertexes     |
     |  1  |  0  |  1  | \em chamfer edges with \em sphere vertexes  |
-    |  2  |  1  |  0  | \em fillet edges with \em chamfer vertexes  |
+    |  2  |  1  |  0  | \em round edges with \em chamfer vertexes   |
     |  3  |  1  |  1  | \em chamfer edges with \em chamfer vertexes |
 
-  \note     Using \em fillet replaces all edges with a quarter circle
+  \note     Using \em round replaces all edges with a quarter circle
             of radius \p vr, inset <tt>[vr, vr]</tt> from the each edge.
   \note     Using \em chamfer replaces all edges with isosceles right
             triangles with side lengths equal to the corner rounding
@@ -302,8 +299,6 @@ module ellipsoid_s
 
     \b Example
     \amu_eval ( function=pyramid_t ${example_dim} )
-
-  \todo Support vertex rounding radius.
 *******************************************************************************/
 module pyramid_t
 (
@@ -315,7 +310,6 @@ module pyramid_t
   a = size*sqrt(3)/2;
 
   translate(center==true ? origin3d : [0,0,o])
-
   polyhedron
   (
     points =
@@ -346,8 +340,6 @@ module pyramid_t
 
     \b Example
     \amu_eval ( function=pyramid_q ${example_dim} )
-
-  \todo Support vertex rounding radius.
 *******************************************************************************/
 module pyramid_q
 (
@@ -430,219 +422,6 @@ module star3d
   }
 }
 
-//! A rectangular cross-sectional profile revolved about the z-axis.
-/***************************************************************************//**
-  \param    size <decimal-list-2|decimal> The profile size. A list [x, y]
-            of decimals or a single decimal for (x=y).
-  \param    core <decimal-list-2|decimal> The profile core. A list [x, y]
-            of decimals or a single decimal for (x=y).
-
-  \param    r <decimal> The rotation radius.
-  \param    l <decimal-list-2|decimal> The elongation length.
-            A list [x, y] of decimals or a single decimal for (x=y)
-
-  \param    t <decimal-list-2|decimal> The profile thickness. A list [x, y]
-            of decimals or a single decimal for (x=y).
-
-  \param    co <decimal-list-2> Core offset. A list [x, y] of decimals.
-  \param    cr <decimal> Core z-rotation.
-
-  \param    vr <decimal-list-4|decimal> The profile default corner rounding
-            radius. A list [v1r, v2r, v3r, v4r] of decimals or a single
-            decimal for (v1r=v2r=v3r=v4r). Unspecified corners are not rounded.
-  \param    vr1 <decimal-list-4|decimal> The profile outer corner rounding radius.
-  \param    vr2 <decimal-list-4|decimal> The profile core corner rounding radius.
-
-  \param    vrm <integer> The default corner radius mode.
-            A 4-bit encoded integer that indicates each corner finish.
-            Use bit value \b 0 for \em fillet and \b 1 for \em chamfer.
-  \param    vrm1 <integer> The outer corner radius mode.
-  \param    vrm2 <integer> The core corner radius mode.
-
-  \param    pa <decimal> The profile pitch angle in degrees.
-  \param    ra <decimal> The rotation sweep angle in degrees.
-  \param    m <integer> The section render mode. An 8-bit encoded integer
-            that indicates the revolution sections to render.
-
-  \param    center <boolean> Rotate about profile center.
-  \param    profile <boolean> Show profile only (do not extrude).
-
-  \details
-
-    \sa rotate_extrude_tre for description of extrude parameters.
-
-    Thickness \p t
-    \li <tt>core = size - t</tt>; when \p t and \p size are given.
-    \li <tt>size = core + t</tt>; when \p t and \p core are given.
-
-    \b Example
-    \amu_eval ( function=torus_rp ${example_dim} )
-*******************************************************************************/
-module torus_rp
-(
-  size,
-  core,
-  r,
-  l,
-  t,
-  co,
-  cr = 0,
-  vr,
-  vr1,
-  vr2,
-  vrm = 0,
-  vrm1,
-  vrm2,
-  pa = 0,
-  ra = 360,
-  m = 255,
-  center = false,
-  profile = false
-)
-{
-  rotate_extrude_tre( r=r, l=l, pa=pa, ra=ra, m=m, profile=profile )
-  rectangle_c
-  (
-    size=size, core=core, t=t,
-    co=co, cr=cr,
-    vr=vr, vr1=vr1, vr2=vr2,
-    vrm=vrm, vrm1=vrm1, vrm2=vrm2,
-    center=center
-  );
-}
-
-//! A triangular cross-sectional profile revolved about the z-axis.
-/***************************************************************************//**
-  \param    size <decimal-list-3|decimal> The size. A list [s1, s2, s3]
-            of decimals or a single decimal for (s1=s2=s3).
-  \param    core <decimal-list-3|decimal> The core. A list [s1, s2, s3]
-            of decimals or a single decimal for (s1=s2=s3).
-
-  \param    r <decimal> The rotation radius.
-  \param    l <decimal-list-2|decimal> The elongation length.
-            A list [x, y] of decimals or a single decimal for (x=y)
-
-  \param    co <decimal-list-2> Core offset. A list [x, y] of decimals.
-  \param    cr <decimal> Core z-rotation.
-
-  \param    vr <decimal-list-3|decimal> The default vertex rounding radius.
-            A list [v1r, v2r, v3r] of decimals or a single decimal for
-            (v1r=v2r=v3r).
-  \param    vr1 <decimal-list-3|decimal> The outer vertex rounding radius.
-  \param    vr2 <decimal-list-3|decimal> The core vertex rounding radius.
-
-  \param    pa <decimal> The profile pitch angle in degrees.
-  \param    ra <decimal> The rotation sweep angle in degrees.
-  \param    m <integer> The section render mode. An 8-bit encoded integer
-            that indicates the revolution sections to render.
-
-  \param    centroid <boolean> Rotate about profile centroid.
-  \param    incenter <boolean> Rotate about profile incenter.
-  \param    profile <boolean> Show profile only (do not extrude).
-
-  \details
-
-    \sa rotate_extrude_tre for description of extrude parameters.
-
-    \b Example
-    \amu_eval ( function=torus_tp ${example_dim} )
-
-  \note The outer and inner triangles centroids are aligned prior to the
-        core removal.
-*******************************************************************************/
-module torus_tp
-(
-  size,
-  core,
-  r,
-  l,
-  co,
-  cr = 0,
-  vr,
-  vr1,
-  vr2,
-  pa = 0,
-  ra = 360,
-  m = 255,
-  centroid = false,
-  incenter = false,
-  profile = false,
-)
-{
-  rotate_extrude_tre( r=r, l=l, pa=pa, ra=ra, m=m, profile=profile )
-  triangle_ls_c
-  (
-    vs=size, vc=core,
-    co=co, cr=cr,
-    vr=vr, vr1=vr1, vr2=vr2,
-    centroid=centroid, incenter=incenter
-  );
-}
-
-//! An elliptical cross-sectional profile revolved about the z-axis.
-/***************************************************************************//**
-  \param    size <decimal-list-2|decimal> The profile size. A list [x, y]
-            of decimals or a single decimal for (x=y).
-  \param    core <decimal-list-2|decimal> The profile core. A list [x, y]
-            of decimals or a single decimal for (x=y).
-
-  \param    r <decimal> The rotation radius.
-  \param    l <decimal-list-2|decimal> The elongation length.
-            A list [x, y] of decimals or a single decimal for (x=y)
-
-  \param    t <decimal-list-2|decimal> The profile thickness. A list [x, y]
-            of decimals or a single decimal for (x=y).
-
-  \param    a1 <decimal> The profile start angle in degrees.
-  \param    a2 <decimal> The profile stop angle in degrees.
-
-  \param    co <decimal-list-2> Core offset. A list [x, y] of decimals.
-  \param    cr <decimal> Core z-rotation.
-
-  \param    pa <decimal> The profile pitch angle in degrees.
-  \param    ra <decimal> The rotation sweep angle in degrees.
-  \param    m <integer> The section render mode. An 8-bit encoded integer
-            that indicates the revolution sections to render.
-
-  \param    profile <boolean> Show profile only (do not extrude).
-
-  \details
-
-    \sa rotate_extrude_tre for description of extrude parameters.
-
-    Thickness \p t
-    \li <tt>core = size - t</tt>; when \p t and \p size are given.
-    \li <tt>size = core + t</tt>; when \p t and \p core are given.
-
-    \b Example
-    \amu_eval ( function=torus_ep ${example_dim} )
-*******************************************************************************/
-module torus_ep
-(
-  size,
-  core,
-  r,
-  l,
-  t,
-  a1 = 0,
-  a2 = 0,
-  co,
-  cr = 0,
-  pa = 0,
-  ra = 360,
-  m = 255,
-  profile = false
-)
-{
-  rotate_extrude_tre( r=r, l=l, pa=pa, ra=ra, m=m, profile=profile )
-  ellipse_cs
-  (
-    size=size, core=core, t=t,
-    a1=a1, a2=a2,
-    co=co, cr=cr
-  );
-}
-
 //! @}
 //! @}
 
@@ -653,10 +432,10 @@ module torus_ep
 /*
 BEGIN_SCOPE dim;
   BEGIN_OPENSCAD;
-    include <shapes/derivative_3d.scad>;
+    include <omdl-base.scad>;
 
-    shape = "cuboid";
-    $fn = 72;
+    shape = "cone";
+    $fn = 36;
 
     if (shape == "cone")
       cone( h=25, r=10, vr=2 );
@@ -672,12 +451,6 @@ BEGIN_SCOPE dim;
       pyramid_q( size=[35,20,5], center=true );
     else if (shape == "star3d")
       star3d( size=40, n=5, half=true );
-    else if (shape == "torus_rp")
-      torus_rp( size=[40,20], core=[35,20], r=40, l=[90,60], co=[0,2.5], vr=4, vrm=15, center=true );
-    else if (shape == "torus_tp")
-      torus_tp( size=40, core=30, r=60, co=[0,-4], vr=4, pa=90, ra=270, centroid=true );
-    else if (shape == "torus_ep")
-      torus_ep( size=[20,15], t=[2,4], r=50, a1=0, a2=180, pa=90, ra=270, co=[0,2] );
   END_OPENSCAD;
 
   BEGIN_MFSCRIPT;
@@ -692,13 +465,10 @@ BEGIN_SCOPE dim;
                 ellipsoid_s
                 pyramid_t
                 pyramid_q
-                torus_rp
-                torus_tp
-                torus_ep
                 star3d
               ";
     variables add_opts_combine "views shapes";
-    variables add_opts "--viewall --autocenter";
+    variables add_opts "--viewall --autocenter --view=axes";
 
     include --path "${INCLUDE_PATH}" script_std.mfs;
   END_MFSCRIPT;
@@ -706,12 +476,10 @@ END_SCOPE;
 
 BEGIN_SCOPE manifest;
   BEGIN_OPENSCAD;
-    include <shapes/derivative_3d.scad>;
+    include <omdl-base.scad>;
 
-    group = 1;
-    $fn = 72;
+    $fn = 36;
 
-    if (group == 1)
     grid_repeat( g=4, i=60, center=true )
     {
       translate([0,0,-12.5]) cone( h=25, r=15, vr=2 );
@@ -720,24 +488,12 @@ BEGIN_SCOPE manifest;
       ellipsoid_s( size=[60,15], a1=0, a2=270 );
       pyramid_t( size=15, center=true );
       pyramid_q( size=[35,40,25], center=true );
-      star3d(size=40, n=5, half=false);
-    }
-
-    if (group == 2)
-    grid_repeat( g=4, i=150, center=true )
-    {
-      torus_rp( size=[40,20], core=[35,20], r=40, l=[25,60], co=[0,2.5], vr=4, vrm=15, center=true );
-      torus_tp( size=40, core=30, r=60, co=[0,-4], vr=4, pa=90, ra=270, centroid=true );
-      torus_ep( size=[20,15], t=[2,4], r=60, a1=0, a2=180, pa=90, ra=270, co=[0,2] );
+      star3d( size=40, n=5, half=false );
     }
   END_OPENSCAD;
 
   BEGIN_MFSCRIPT;
     include --path "${INCLUDE_PATH}" {config_base,config_stl}.mfs;
-
-    defines   name "group" define "group" integers "1 2";
-    variables set_opts_combine "group";
-
     include --path "${INCLUDE_PATH}" script_std.mfs;
   END_MFSCRIPT;
 END_SCOPE;

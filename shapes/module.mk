@@ -8,15 +8,20 @@ local_path        :=  shapes
 
 local_library     :=  module \
                       \
-                      derivative_2d \
-                      derivative_2de \
-                      derivative_3d
-
-local_release_add :=  svg/derivative_2d_manifest.svg \
+                      basic_2d \
+                      basic_2de \
+                      basic_2dr \
+                      basic_3d \
                       \
-                      stl/derivative_2de_manifest.stl \
-                      stl/derivative_3d_manifest_1.stl \
-                      stl/derivative_3d_manifest_2.stl \
+                      polygon_2d
+
+local_release_add :=  svg/basic_2d_manifest.svg \
+                      \
+                      stl/basic_2de_manifest.stl \
+                      stl/basic_2dr_manifest.stl \
+                      stl/basic_3d_manifest.stl \
+                      \
+                      stl/polygon_2d_manifest.stl
 
 
 local_backup_add  :=

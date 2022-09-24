@@ -1,8 +1,8 @@
-//! Include wrapper of base math includes files.
+//! Drafting include wrapper.
 /***************************************************************************//**
   \file
   \author Roy Allen Sutton
-  \date   2015-2018
+  \date   2019
 
   \copyright
 
@@ -27,13 +27,17 @@
 
   \details
 
-  \amu_include (include/amu/pgid_pparent_path_pg.amu)
+  \amu_include (include/amu/pgid_path_pstem_p.amu)
 *******************************************************************************/
 
-include <../datatypes/datatypes-base.scad>;
+//----------------------------------------------------------------------------//
+// include components
+//----------------------------------------------------------------------------//
 
-include <linear_algebra.scad>;
-include <vector_algebra.scad>;
+include <config.scad>;
+include <primitive.scad>;
+include <operation.scad>;
+include <dimension.scad>;
 
 //----------------------------------------------------------------------------//
 // end of file

@@ -1,8 +1,8 @@
-//! Include wrapper of base data types includes files.
+//! General and other category tools.
 /***************************************************************************//**
   \file
   \author Roy Allen Sutton
-  \date   2015-2018
+  \date   2019
 
   \copyright
 
@@ -27,18 +27,45 @@
 
   \details
 
-  \amu_include (include/amu/pgid_pparent_path_pg.amu)
+    \amu_define group_name  (General)
+    \amu_define group_brief (General and other category tools.)
+
+  \amu_include (include/amu/pgid_path_pstem_pg.amu)
 *******************************************************************************/
 
-include <../constants.scad>;
+//----------------------------------------------------------------------------//
+// group.
+//----------------------------------------------------------------------------//
 
-include <identify_scalar.scad>;
-include <identify_iterable.scad>;
-include <identify_list.scad>;
+/***************************************************************************//**
+  \amu_include (include/amu/group_in_parent_start.amu)
+*******************************************************************************/
 
-include <operate_scalar.scad>;
-include <operate_iterable.scad>;
-include <operate_list.scad>;
+//----------------------------------------------------------------------------//
+
+//! Conditionally apply the convex hull transformation.
+/***************************************************************************//**
+  \param    c <boolean> conditional.
+
+  \details
+
+    When \p c == \b true, apply the transformation to the child object,
+    otherwise return the object unmodified.
+*******************************************************************************/
+module hull_if
+(
+  c = false
+)
+{
+  if ( c )
+    hull()
+    children();
+  else
+    children();
+}
+
+//! @}
+//! @}
 
 //----------------------------------------------------------------------------//
 // end of file

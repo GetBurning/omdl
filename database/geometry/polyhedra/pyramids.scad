@@ -2,7 +2,7 @@
 /***************************************************************************//**
   \file
   \author Roy Allen Sutton
-  \date   2017-2018
+  \date   2017-2019
 
   \copyright
 
@@ -401,9 +401,7 @@ dtr_polyhedra_pyramids =
 BEGIN_SCOPE db;
 BEGIN_SCOPE autostat;
   BEGIN_OPENSCAD;
-    include <math/polytope.scad>;
-    include <math/utility.scad>;
-    include <datatypes/table.scad>;
+    include <omdl-base.scad>;
     include <database/geometry/polyhedra/pyramids.scad>;
 
     fs  = "^";
@@ -411,13 +409,13 @@ BEGIN_SCOPE autostat;
     tc = dtc_polyhedra_pyramids;
     tr = dtr_polyhedra_pyramids;
 
-    ids = get_table_ridl(tr);
+    ids = table_get_row_ids(tr);
 
     echo
     (
       str
       (
-        "no.", fs, "table id", fs, "other name", fs,
+        "no.", fs, "id", fs, "other name", fs,
         "vertices", fs, "faces", fs, "edges",
 
         fs, "face-verticies",
@@ -431,15 +429,15 @@ BEGIN_SCOPE autostat;
     {
       i = first(find(id, ids, c=1))+1;
 
-      n = get_table_v(tr, tc, id, "n");
-      o = get_table_v(tr, tc, id, "o");
-      g = get_table_v(tr, tc, id, "g");
-      d = get_table_v(tr, tc, id, "d");
+      n = table_get_value(tr, tc, id, "n");
+      o = table_get_value(tr, tc, id, "o");
+      g = table_get_value(tr, tc, id, "g");
+      d = table_get_value(tr, tc, id, "d");
 
-      c = get_table_v(tr, tc, id, "c");
-      s = get_table_v(tr, tc, id, "s");
-      f = get_table_v(tr, tc, id, "f");
-      e = get_table_v(tr, tc, id, "e");
+      c = table_get_value(tr, tc, id, "c");
+      s = table_get_value(tr, tc, id, "s");
+      f = table_get_value(tr, tc, id, "f");
+      e = table_get_value(tr, tc, id, "e");
 
       fo = is_empty(o) ? "-" : o;
 
@@ -450,10 +448,10 @@ BEGIN_SCOPE autostat;
           i, fs, id, fs, fo, fs,
           len(c), fs, len(f), fs, len(e),
 
-          fs, hist(qsort(polytope_face_vcounts(f)), m=9),
-          fs, hist(qsort(dround(polytope_face_angles(c, f), d=1)), m=9),
-          fs, hist(qsort(sround(polytope_edge_lengths(c, e), d=3)), m=9),
-          fs, hist(qsort(dround(polytope_edge_angles(c, f), d=1)), m=9),
+          fs, histogram(qsort(polytope_face_vertex_counts(f)), m=9),
+          fs, histogram(qsort(dround(polytope_face_angles(c, f), d=1)), m=9),
+          fs, histogram(qsort(sround(polytope_edge_lengths(c, e), d=3)), m=9),
+          fs, histogram(qsort(dround(polytope_edge_angles(c, f), d=1)), m=9),
 
           fs
         )
@@ -473,9 +471,7 @@ END_SCOPE;
 BEGIN_SCOPE db;
 BEGIN_SCOPE dim;
   BEGIN_OPENSCAD;
-    include <units/coordinate.scad>;
-    include <tools/polytope.scad>;
-    include <datatypes/table.scad>;
+    include <omdl-base.scad>;
     include <database/geometry/polyhedra/pyramids.scad>;
 
     config = 0;
@@ -486,11 +482,11 @@ BEGIN_SCOPE dim;
     id = "default";
     sr = 100;
 
-    pv = get_table_v(tr, tc, id, "c");
-    pf = get_table_v(tr, tc, id, "f");
-    pe = get_table_v(tr, tc, id, "e");
+    pv = table_get_value(tr, tc, id, "c");
+    pf = table_get_value(tr, tc, id, "f");
+    pe = table_get_value(tr, tc, id, "e");
 
-    sv = coordinates_csc(pv, sr);
+    sv = coordinate_scale3d_csc(pv, sr);
 
     if (config == 0)  // png preview
     {
@@ -527,7 +523,7 @@ BEGIN_SCOPE dim;
                 triangular_pyramid
               ";
     variables add_opts_combine "views ids";
-    variables add_opts "-D config=0 --viewall --autocenter";
+    variables add_opts "-D config=0 --viewall --autocenter --view=axes";
 
     include --path "${INCLUDE_PATH}" script_new.mfs;
 

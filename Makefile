@@ -6,7 +6,7 @@
 #
 ################################################################################
 
-AMU_TOOL_VERSION              := v2.6
+AMU_TOOL_VERSION              := v2.7
 
 AMU_TOOL_PREFIX               := /usr/local/bin/
 AMU_LIB_PATH                  := /usr/local/share/openscad-amu/$(AMU_TOOL_VERSION)
@@ -107,6 +107,7 @@ generate_latex                          := $(false)
 release_root                            := release
 release_project                         := $(false)
 release_library                         := $(false)
+release_archive_project                 := $(false)
 release_archive_doxygen                 := $(true)
 release_archive_scopes                  := $(false)
 

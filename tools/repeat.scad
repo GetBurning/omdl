@@ -2,7 +2,7 @@
 /***************************************************************************//**
   \file
   \author Roy Allen Sutton
-  \date   2015-2018
+  \date   2015-2019
 
   \copyright
 
@@ -34,17 +34,14 @@
   \amu_include (include/amu/pgid_path_pstem_pg.amu)
 *******************************************************************************/
 
-include <../math/vector_algebra.scad>;
-include <../math/other_shape.scad>;
-
 //----------------------------------------------------------------------------//
-// openscad-amu macros
+// group and macros.
 //----------------------------------------------------------------------------//
 
 /***************************************************************************//**
-  \amu_include (include/amu/example_dim_table.amu)
-
   \amu_include (include/amu/group_in_parent_start.amu)
+
+  \amu_include (include/amu/example_dim_table.amu)
 *******************************************************************************/
 
 //----------------------------------------------------------------------------//
@@ -52,7 +49,8 @@ include <../math/other_shape.scad>;
 //! Distribute copies of a 2d or 3d shape equally about a z-axis radius.
 /***************************************************************************//**
   \param    n <integer> The number of equally spaced radii.
-  \param    r <decimal> The shape move radius.
+  \param    r <decimal> The radial move distance.
+  \param    o <decimal> The rotational angular offset.
   \param    angle <boolean> Rotate each copy about z-axis.
   \param    move <boolean> Move each shape copy to radii coordinate.
 
@@ -65,11 +63,12 @@ module radial_repeat
 (
   n,
   r = 1,
+  o = 0,
   angle = true,
   move = false
 )
 {
-  for ( p = rpolygon_lp( r=r, n=n ) )
+  for ( p = polygon2d_regular_p( n=n, r=r, o=o ) )
   {
     translate(move==true ? p : origin2d)
     rotate(angle==true ? [0, 0, angle_ll(x_axis2d_uv, p)] : origin3d)
@@ -177,10 +176,10 @@ module grid_repeat
 /*
 BEGIN_SCOPE dim;
   BEGIN_OPENSCAD;
-    include <tools/repeat.scad>;
+    include <omdl-base.scad>;
 
     shape = "radial_repeat";
-    $fn = 72;
+    $fn = 36;
 
     if (shape == "radial_repeat")
       radial_repeat( n=7, r=6, move=true ) square( [20,1], center=true );
@@ -198,7 +197,7 @@ BEGIN_SCOPE dim;
                 grid_repeat
               ";
     variables add_opts_combine "views shapes";
-    variables add_opts "--viewall --autocenter";
+    variables add_opts "--viewall --autocenter --view=axes";
 
     include --path "${INCLUDE_PATH}" script_std.mfs;
   END_MFSCRIPT;

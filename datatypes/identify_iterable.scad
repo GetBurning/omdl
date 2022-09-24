@@ -2,7 +2,7 @@
 /***************************************************************************//**
   \file
   \author Roy Allen Sutton
-  \date   2015-2018
+  \date   2015-2019
 
   \copyright
 
@@ -112,6 +112,19 @@ function any_equal
   \warning  Always returns \b true when the list is empty.
 *******************************************************************************/
 function all_defined(v) = !any_equal(v, undef);
+
+//! Test if any element of a list of values is defined.
+/***************************************************************************//**
+  \param    v \<list> A list of values.
+
+  \returns  <boolean> \b true when any element is defined
+            and \b false otherwise.
+
+  \details
+
+  \warning  Always returns \b false when the list is empty.
+*******************************************************************************/
+function any_defined(v) = !all_equal(v, undef);
 
 //! Test if any element of a list of values is undefined.
 /***************************************************************************//**
@@ -243,9 +256,7 @@ function all_len
 /*
 BEGIN_SCOPE validate;
   BEGIN_OPENSCAD;
-    include <console.scad>;
-    include <datatypes/datatypes-base.scad>;
-    include <datatypes/table.scad>;
+    include <omdl-base.scad>;
     include <validation.scad>;
 
     echo( str("openscad version ", version()) );
@@ -286,7 +297,7 @@ BEGIN_SCOPE validate;
       ["t23", "Test list 13",               [true, true, true, true]]
     ];
 
-    test_ids = get_table_ridl( test_r );
+    test_ids = table_get_row_ids( test_r );
 
     // expected columns: ("id" + one column for each test)
     good_c = pmerge([concat("id", test_ids), concat("identifier", test_ids)]);
@@ -306,6 +317,7 @@ BEGIN_SCOPE validate;
       ["any_equal_F",       f, f, f, t, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, t, t, f],
       ["any_equal_U",       t, f, f, f, f, f, f, f, f, f, t, f, f, f, f, f, f, t, t, f, f, f, f],
       ["all_defined",       f, t, t, t, t, t, t, t, t, t, f, t, t, t, t, t, t, f, f, t, t, t, t],
+      ["any_defined",       f, t, t, t, t, t, f, f, t, t, f, t, t, t, t, t, t, t, f, t, t, t, t],
       ["any_undefined",     t, f, f, f, f, f, f, f, f, f, t, f, f, f, f, f, f, t, t, f, f, f, f],
       ["all_scalars",       u, t, t, t, f, f, s, s, s, s, t, t, t, f, f, f, f, t, t, f, t, t, t],
       ["all_lists",         u, f, f, f, f, f, t, t, f, f, f, f, f, t, t, f, t, f, f, t, f, f, f],
@@ -321,13 +333,13 @@ BEGIN_SCOPE validate;
     table_check( good_r, good_c, false );
 
     // validate helper function and module
-    function get_value( vid ) = get_table_v(test_r, test_c, vid, "tv");
+    function get_value( vid ) = table_get_value(test_r, test_c, vid, "tv");
     module log_test( m ) { log_type ( "test", m ); }
     module log_notest( f ) { log_test ( str("not tested: '", f, "'") ); }
     module run_test( fname, fresult, vid )
     {
-      value_text = get_table_v(test_r, test_c, vid, "td");
-      pass_value = get_table_v(good_r, good_c, fname, vid);
+      value_text = table_get_value(test_r, test_c, vid, "td");
+      pass_value = table_get_value(good_r, good_c, fname, vid);
 
       test_pass = validate( cv=fresult, t="equals", ev=pass_value, pf=true );
       test_text = validate( str(fname, "(", get_value(vid), ")=", pass_value), fresult, "equals", pass_value );
@@ -351,6 +363,7 @@ BEGIN_SCOPE validate;
     for (vid=test_ids) run_test( "any_equal_F", any_equal(get_value(vid),f), vid );
     for (vid=test_ids) run_test( "any_equal_U", any_equal(get_value(vid),u), vid );
     for (vid=test_ids) run_test( "all_defined", all_defined(get_value(vid)), vid );
+    for (vid=test_ids) run_test( "any_defined", any_defined(get_value(vid)), vid );
     for (vid=test_ids) run_test( "any_undefined", any_undefined(get_value(vid)), vid );
     for (vid=test_ids) run_test( "all_scalars", all_scalars(get_value(vid)), vid );
     for (vid=test_ids) run_test( "all_lists", all_lists(get_value(vid)), vid );

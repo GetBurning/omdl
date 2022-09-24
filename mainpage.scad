@@ -2,7 +2,7 @@
 /***************************************************************************//**
   \file
   \author Roy Allen Sutton
-  \date   2015-2018
+  \date   2015-2019
 
   \copyright
 
@@ -275,24 +275,25 @@
 
   \subsubsection dt_line Lines and vectors
 
-    The data type \b line refers to a convention for specifying a line
-    or a vector. A vector is a direction and magnitude in space. A
-    line, too, has direction and magnitude, but also has location, as
-    it starts at one point in space and ends at another. Operators in
-    [omdl] make use of a common convention for specifying Euclidean
-    vectors and straight lines as summarized in the following table:
+    A \b vector has a direction and magnitude in space. A \b line, too,
+    has direction and magnitude, but also has location, as it starts at
+    one point in space and ends at another. Although a line can be
+    specified in one dimension, most library functions operate on two
+    and/or three dimensional lines. Operators in [omdl] make use of a
+    common convention for specifying Euclidean vectors and straight
+    lines as summarized in the following table:
 
     Given two points \c 'p1' and \c 'p2', in space:
 
-    | no. | form      | description                                   |
-    |:---:|:---------:|:----------------------------------------------|
-    |  1  | p2        | a line or vector from the origin to 'p2'      |
-    |  2  | [p2]      | a line or vector from the origin to 'p2'      |
-    |  3  | [p1, p2]  | line or vector from 'p1' to 'p2'              |
+    | no. | form      | description                       |
+    |:---:|:---------:|:----------------------------------|
+    |  1  | p2        | a vector from the origin to 'p2'  |
+    |  2  | [p2]      | a vector from the origin to 'p2'  |
+    |  3  | [p1, p2]  | a line from 'p1' to 'p2'          |
 
-    The functions get_line_dim(), get_line_tp(), get_line_ip(), and
-    get_line2origin(), are available to identify the dimension of and
-    convert a line into a vector or point.
+    The functions is_point(), is_vector(), is_line(), line_dim(),
+    line_tp(), line_ip(), vector_to_line(), and line_to_vector(), are
+    available for type identification and convertion.
 
     \b Example
 
@@ -301,9 +302,11 @@
     p1 = [a,b,c]
     p2 = [d,e,f]
 
-    // lines and vectors
+    // vectors
     v1 = p2       = [d,e,f]
     v2 = [p2]     = [[d,e,f]]
+
+    // lines
     v3 = [p1, p2] = [[a,b,c], [d,e,f]]
 
     v1 == v2
@@ -337,8 +340,8 @@
     |  3  | [v1, v2]      | two distinct but intersecting vectors         |
     |  4  | [p1, p2, p3]  | three (or more) non-collinear coplanar points |
 
-    The function get_pnorm2nv() can be used to convert a value of this
-    data type into a normal vector.
+    The functions is_plane() and plane_to_normal() are available for
+    type identification and convertion.
 
     \b Example
 
@@ -415,12 +418,11 @@
 /*
 BEGIN_SCOPE logo;
   BEGIN_OPENSCAD;
-    include <shapes/derivative_2de.scad>;
-    include <shapes/derivative_3d.scad>;
+    include <omdl-base.scad>;
 
     $fn = 36;
 
-    frame = triangle_lp2ls( [ [30,0], [0,40], [30,40] ] );
+    frame = triangle_ppp2sss( [ [30,0], [0,40], [30,40] ] );
     core  = 2 * frame / 3;
     vrnd  = [1, 2, 4];
 
@@ -447,7 +449,7 @@ BEGIN_SCOPE quickstart;
 
     $fn = 36;
 
-    frame = triangle_lp2ls( [ [30,0], [0,40], [30,40] ] );
+    frame = triangle_ppp2sss( [ [30,0], [0,40], [30,40] ] );
     core  = 2 * frame / 3;
     vrnd  = [1, 2, 4];
 
@@ -456,7 +458,7 @@ BEGIN_SCOPE quickstart;
     radial_repeat( n=5, angle=true )
       etriangle_ls_c( vs=frame, vc=core, vr=vrnd, h=10 );
 
-    translate([0, -50,0])
+    translate([0, -50, 0])
     linear_extrude(height=10)
     text( text="omdl", size=20, halign="center", valign="center" );
   END_OPENSCAD;
@@ -466,7 +468,7 @@ BEGIN_SCOPE quickstart;
 
     views     name "views" views "top bottom right diag";
     variables add_opts_combine "views";
-    variables add_opts "--viewall --autocenter";
+    variables add_opts "--viewall --autocenter --view=axes";
 
     include --path "${INCLUDE_PATH}" script_new.mfs;
 
